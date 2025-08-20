@@ -9,8 +9,7 @@ namespace EEA.BaseServices.LevelServices
             // check if this level exists in updated levels
 
             // if not, load the level from the resources folder
-
-            TextAsset levelData = Resources.Load<TextAsset>(GetLevelName(index));
+            TextAsset levelData = Resources.Load<TextAsset>(GetLevelName(index + 1));
 
             if (levelData != null)
             {

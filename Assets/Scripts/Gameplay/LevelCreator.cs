@@ -13,7 +13,7 @@ namespace EEA.Gameplay
         {
             var levelData = ServiceManager.LevelService.GetCurrentLevelConfig().LevelData;
 
-            levelIndexText.text = $"Level {ServiceManager.LevelService.ActiveLevelIndex}";
+            levelIndexText.text = $"Level {ServiceManager.LevelService.ActiveLevelIndex + 1}";
 
             string boardString = levelData.BoardHexToBitwise();
 

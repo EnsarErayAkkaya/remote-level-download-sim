@@ -1,4 +1,5 @@
 using System;
+using System.Text;
 
 namespace EEA.BaseServices.LevelServices
 {
@@ -17,9 +18,16 @@ namespace EEA.BaseServices.LevelServices
         /// <returns></returns>
         public string BoardHexToBitwise()
         {
-            // Convert the hex string to a bitwise representation
-            int bitwise = Convert.ToInt32(board, 16);
-            return Convert.ToString(bitwise, 2);
+            StringBuilder binary = new StringBuilder();
+
+            foreach (char c in board)
+            {
+                // Convert each hex digit to a 4-bit binary string
+                int value = Convert.ToInt32(c.ToString(), 16);
+                binary.Append(Convert.ToString(value, 2).PadLeft(4, '0'));
+            }
+
+            return binary.ToString();
         }
     }
 }
