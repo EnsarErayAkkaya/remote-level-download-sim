@@ -2,12 +2,15 @@ using UnityEngine;
 
 namespace EEA.BaseServices.LevelServices
 {
-    [System.Serializable]
-    public abstract class BaseLevelData
+    public enum LevelDifficulty
     {
-        public string Id;
-        
-        public abstract string Serialize();
-        public abstract T Deserialize<T>(string raw) where T : BaseLevelData;
+        Easy = 0, Medium = 1, Hard = 2
+    }
+    public class BaseLevelData
+    {
+        public int Index;
+        public string LevelId;
+        public LevelDifficulty Difficulty;
+        public string BoardHex;
     }
 }

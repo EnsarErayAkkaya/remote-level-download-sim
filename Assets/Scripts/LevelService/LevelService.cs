@@ -39,7 +39,7 @@ namespace EEA.BaseServices.LevelServices
             return null;
         }
 
-        public BaseLevelConfig GetLevelConfig(int index)
+        public BaseLevelConfig GetLevelConfig(int _index)
         {
             return null;
         }
@@ -48,9 +48,9 @@ namespace EEA.BaseServices.LevelServices
             await LoadLevel(GetCurrentLevelIndex());
         }
 
-        public async Task LoadLevel(int index)
+        public async Task LoadLevel(int _index)
         {
-            BaseLevelConfig levelConfig = GetLevelConfig(index);
+            BaseLevelConfig levelConfig = GetLevelConfig(_index);
 
             if (levelConfig == null)
             {
@@ -58,11 +58,11 @@ namespace EEA.BaseServices.LevelServices
             }
 
             activeLevelConfig = levelConfig;
-            activeLevelIndex = index;
+            activeLevelIndex = _index;
 
             await levelConfig.LoadLevel();
 
-            OnLevelStarted?.Invoke(index);
+            OnLevelStarted?.Invoke(_index);
         }
 
         public async Task UnloadLevel()
@@ -76,16 +76,16 @@ namespace EEA.BaseServices.LevelServices
             }
         }
 
-        public void LevelCompleted(bool isSuccessfull)
+        public void LevelCompleted(bool _isSuccessfull)
         {
             int currentLevelIndex = GetCurrentLevelIndex();
 
-            if (isSuccessfull && activeLevelIndex == currentLevelIndex)
+            if (_isSuccessfull && activeLevelIndex == currentLevelIndex)
             {
                 PlayerPrefs.SetInt(LevelSaveKey, ++currentLevelIndex);
             }
 
-            OnLevelCompleted?.Invoke(activeLevelIndex, isSuccessfull);
+            OnLevelCompleted?.Invoke(activeLevelIndex, _isSuccessfull);
             
         }
     }
