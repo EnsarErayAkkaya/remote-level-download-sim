@@ -8,6 +8,12 @@ namespace EEA.BaseServices.LevelServices
     public class BaseLevelConfig
     {
         public BaseLevelData LevelData { get; private set; }
+
+        public BaseLevelConfig(BaseLevelData _levelData)
+        {
+            this.LevelData = _levelData;
+        }
+
         public async Task LoadLevel()
         {
             AsyncOperation op = SceneManager.LoadSceneAsync(2, LoadSceneMode.Additive);

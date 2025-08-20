@@ -11,6 +11,8 @@ namespace EEA.BaseServices.LevelServices
         private BaseLevelConfig activeLevelConfig = null;
         private int activeLevelIndex = -1;
 
+        private LevelLoader levelLoader = new LevelLoader();
+
         private const string LevelSaveKey = "current_level_index";
 
         #region EVENTS
@@ -36,13 +38,16 @@ namespace EEA.BaseServices.LevelServices
 
         public BaseLevelConfig GetCurrentLevelConfig()
         {
-            return null;
+            return GetLevelConfig(GetCurrentLevelIndex());
         }
 
         public BaseLevelConfig GetLevelConfig(int _index)
         {
-            return null;
+            var levelData = levelLoader.LoadLevel(_index);
+
+            return new BaseLevelConfig(levelData);
         }
+
         public async Task LoadNextLevel()
         {
             await LoadLevel(GetCurrentLevelIndex());
@@ -50,17 +55,16 @@ namespace EEA.BaseServices.LevelServices
 
         public async Task LoadLevel(int _index)
         {
-            BaseLevelConfig levelConfig = GetLevelConfig(_index);
+            activeLevelConfig = GetLevelConfig(_index);
 
-            if (levelConfig == null)
+            if (activeLevelConfig == null)
             {
                 return;
             }
 
-            activeLevelConfig = levelConfig;
             activeLevelIndex = _index;
 
-            await levelConfig.LoadLevel();
+            await activeLevelConfig.LoadLevel();
 
             OnLevelStarted?.Invoke(_index);
         }
