@@ -7,7 +7,7 @@ namespace EEA.Utilities
 {
     public static class FileUtilities
     {
-        public static void SaveFile(string savePath, string saveData)
+        public static bool SaveFile(string savePath, string saveData)
         {
             try
             {
@@ -21,10 +21,32 @@ namespace EEA.Utilities
                         writer.Write(saveData);
                     }
                 }
+
+                return true;
             }
             catch (Exception e)
             {
                 Debug.LogError("Error occured when trying to save event data: " + e);
+
+                return false;
+            }
+        }
+
+        public static bool AppendFile(string savePath, string saveData)
+        {
+            try
+            {
+                // create the directory the file will be written to if it doesn't exist
+                Directory.CreateDirectory(Path.GetDirectoryName(savePath));
+
+                File.AppendAllText(savePath, saveData);
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                UnityEngine.Debug.LogError($"Failed to append file at {savePath}: {ex}");
+                return false;
             }
         }
 
@@ -54,12 +76,40 @@ namespace EEA.Utilities
         }
 
 
-        public static async Task SaveFileAsync(string savePath, string saveData)
+        public static async Task<bool> SaveFileAsync(string savePath, string saveData)
         {
-            // create the directory the file will be written to if it doesn't exist
-            Directory.CreateDirectory(Path.GetDirectoryName(savePath));
+            try
+            {
+                // create the directory the file will be written to if it doesn't exist
+                Directory.CreateDirectory(Path.GetDirectoryName(savePath));
 
-            await File.WriteAllTextAsync(savePath, saveData);
+                await File.WriteAllTextAsync(savePath, saveData);
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                UnityEngine.Debug.LogError($"Failed to save file at {savePath}: {ex}");
+                return false;
+            }
+        }
+
+        public static async Task<bool> AppendFileAsync(string savePath, string saveData)
+        {
+            try
+            {
+                // create the directory the file will be written to if it doesn't exist
+                Directory.CreateDirectory(Path.GetDirectoryName(savePath));
+
+                await File.AppendAllTextAsync(savePath, saveData);
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                UnityEngine.Debug.LogError($"Failed to append file at {savePath}: {ex}");
+                return false;
+            }
         }
 
         public static async Task<string> ReadFileAsync(string savePath)

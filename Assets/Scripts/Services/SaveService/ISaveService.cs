@@ -6,34 +6,36 @@ namespace EEA.BaseServices.SaveServices
     public interface ISaveService
     {
         // ASYNC FUNCTIONS
-        public Task<string> LoadDataAsync(string saveKey);
-        public Task<float> LoadFloatDataAsync(string saveKey);
+        Task<string> LoadDataAsync(string saveKey);
+        Task<float> LoadFloatDataAsync(string saveKey);
 
-        public Task<long> LoadLongDataAsync(string saveKey);
+        Task<long> LoadLongDataAsync(string saveKey);
 
-        public Task<double> LoadDoubleDataAsync(string saveKey);
+        Task<double> LoadDoubleDataAsync(string saveKey);
 
-        public Task<int> LoadIntDataAsync(string saveKey);
+        Task<int> LoadIntDataAsync(string saveKey);
 
-        public Task<bool> LoadBoolDataAsync(string saveKey);
+        Task<bool> LoadBoolDataAsync(string saveKey);
 
-        public Task SaveDataAsync(string saveKey, string saveData);
+        Task<bool> SaveDataAsync(string saveKey, string saveData);
+        Task<bool> AppendDataAsync(string saveKey, string saveData);
 
         // SYNC FUNCTIONS
-        public string LoadData(string saveKey);
+        string LoadData(string saveKey);
 
-        public float LoadFloatData(string saveKey);
+        float LoadFloatData(string saveKey);
 
-        public long LoadLongData(string saveKey);
+        long LoadLongData(string saveKey);
 
-        public double LoadDoubleData(string saveKey);
+        double LoadDoubleData(string saveKey);
 
-        public int LoadIntData(string saveKey);
+        int LoadIntData(string saveKey);
 
-        public bool LoadBoolData(string saveKey);
+        bool LoadBoolData(string saveKey);
 
-        public void SaveData(string saveKey, string saveData);
+        bool SaveData(string saveKey, string saveData);
+        bool AppendData(string saveKey, string saveData);
 
-        public bool CheckKeyExist(string saveKey);
+        bool CheckKeyExist(string saveKey);
     }
 }

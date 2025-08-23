@@ -7,10 +7,12 @@ namespace EEA.BaseServices.LevelServices
     {
         Easy = 0, Medium = 1, Hard = 2
     }
+
+    [Serializable]
     public class BaseLevelData
     {
-        public LevelDifficulty difficulty;
-        public string board;
+        public LevelDifficulty d;
+        public string b;
 
         /// <summary>
         /// Converts the board hex string to a bitwise representation.
@@ -20,7 +22,7 @@ namespace EEA.BaseServices.LevelServices
         {
             StringBuilder binary = new StringBuilder();
 
-            foreach (char c in board)
+            foreach (char c in b)
             {
                 // Convert each hex digit to a 4-bit binary string
                 int value = Convert.ToInt32(c.ToString(), 16);

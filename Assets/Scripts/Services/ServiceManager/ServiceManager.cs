@@ -1,7 +1,8 @@
 using EEA.BaseServices.LevelServices;
+using EEA.BaseServices.RemoteLevelServices;
 using EEA.BaseServices.SaveServices;
+using EEA.Utilities;
 using System;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -13,6 +14,7 @@ namespace EEA.BaseServices
 
         public Action OnServicesReady { get; set; }
 
+        private RemoteLevelService remoteLevelService;
         private LevelService levelService;
         private SaveService saveService;
 
@@ -21,6 +23,7 @@ namespace EEA.BaseServices
         #region GETTERS
         public ServiceManagerSettings Settings => settings;
         public static ILevelService LevelService => instance.levelService;
+        public static IRemoteLevelService RemoteLevelService => instance.remoteLevelService;
         public static ISaveService SaveService => instance.saveService;
         public static ServiceManager Instance => instance;
         #endregion
@@ -34,12 +37,49 @@ namespace EEA.BaseServices
 
             instance = this;
         }
-        
-        private void Start()
+
+        private async void Start()
         {
             saveService = new SaveService(new EncryptedSaveHandler());
 
             levelService = new LevelService(settings.levelServiceSettings);
+
+            remoteLevelService = new RemoteLevelService();
+
+            int currentLevelIndex = levelService.GetCurrentLevelIndex();
+
+            try
+            {
+                int startingLevel = currentLevelIndex + 1;
+
+                Backoff backoff = new Backoff();
+                await backoff.DoAsync(
+                        action: () => remoteLevelService.DownloadLevelAsync(startingLevel),
+                        validateResult: () => remoteLevelService.DownloadLog.IsLevelDownloaded(startingLevel),
+                        maxRetries: 3);
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError(ex.ToString());
+            }
+
+
+            try
+            {
+                int levelRangeFrom = (currentLevelIndex - (currentLevelIndex % 25)) + 1;
+                int levelRangeTo = levelRangeFrom + 50;
+
+                Backoff downloadLevelRangeBackoff = new Backoff();
+                _ = downloadLevelRangeBackoff.DoAsync(
+                    action: () => remoteLevelService.BatchDownloadLevels(levelRangeFrom, levelRangeTo),
+                    validateResult: () => remoteLevelService.IsAllLevelsDownloadedInRange(levelRangeFrom, levelRangeTo),
+                    maxRetries: 3);
+
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError(ex.ToString());
+            }
 
             OnServicesReady?.Invoke();
 

@@ -1,7 +1,6 @@
-using System.Threading.Tasks;
-using UnityEngine.SceneManagement;
-using EEA.Utilities;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace EEA.BaseServices.LevelServices
 {
@@ -14,17 +13,16 @@ namespace EEA.BaseServices.LevelServices
             this.LevelData = _levelData;
         }
 
-        public async Task LoadLevel()
+        public async UniTask LoadLevel()
         {
-            AsyncOperation op = SceneManager.LoadSceneAsync(2, LoadSceneMode.Additive);
-            await op.AsTask();
+            await SceneManager.LoadSceneAsync(2, LoadSceneMode.Additive);
         }
-        public async Task UnloadLevel()
+        public async UniTask UnloadLevel()
         {
             AsyncOperation op = SceneManager.UnloadSceneAsync(2);
             AsyncOperation op1 = SceneManager.LoadSceneAsync(1, LoadSceneMode.Additive);
 
-            await Task.WhenAll(op.AsTask(), op1.AsTask());
+            await UniTask.WhenAll(op.ToUniTask(), op1.ToUniTask());
         }
     }
 }

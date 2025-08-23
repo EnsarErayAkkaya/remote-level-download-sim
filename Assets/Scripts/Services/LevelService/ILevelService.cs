@@ -1,5 +1,5 @@
+using Cysharp.Threading.Tasks;
 using System;
-using System.Threading.Tasks;
 
 namespace EEA.BaseServices.LevelServices
 {
@@ -15,9 +15,9 @@ namespace EEA.BaseServices.LevelServices
 
         public int GetCurrentLevelIndex();
         public BaseLevelConfig GetCurrentLevelConfig();
-        public Task LoadLevel(int index);
-        public Task LoadNextLevel();
-        public Task UnloadLevel();
+        public UniTask LoadLevel(int index);
+        public UniTask LoadNextLevel();
+        public UniTask UnloadLevel();
         public void LevelCompleted(bool isSuccessfull);
     }
 }

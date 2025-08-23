@@ -1,8 +1,5 @@
 using EEA.Utilities;
-using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 
@@ -10,8 +7,6 @@ namespace EEA.BaseServices.SaveServices
 {
     public class EncryptedSaveHandler : ISaveHandler
     {
-        public bool CanUpdatePartially => false;
-
         public async Task<string> LoadDataAsync(string saveKey)
         {
             string data = await FileUtilities.ReadFileAsync(Path.Join(Application.persistentDataPath, saveKey));
@@ -19,9 +14,14 @@ namespace EEA.BaseServices.SaveServices
             return data;
         }
 
-        public async Task SaveDataAsync(string saveKey, string saveData)
+        public async Task<bool> SaveDataAsync(string saveKey, string saveData)
         {
-            await FileUtilities.SaveFileAsync(Path.Join(Application.persistentDataPath, saveKey), saveData);
+            return await FileUtilities.SaveFileAsync(Path.Join(Application.persistentDataPath, saveKey), saveData);
+        }
+
+        public async Task<bool> AppendDataAsync(string saveKey, string saveData)
+        {
+            return await FileUtilities.AppendFileAsync(Path.Join(Application.persistentDataPath, saveKey), saveData);
         }
 
         // SYNC METHODS
@@ -32,9 +32,14 @@ namespace EEA.BaseServices.SaveServices
             return data;
         }
 
-        public void SaveData(string saveKey, string saveData)
+        public bool SaveData(string saveKey, string saveData)
         {
-            FileUtilities.SaveFile(Path.Join(Application.persistentDataPath, saveKey), saveData);
+            return FileUtilities.SaveFile(Path.Join(Application.persistentDataPath, saveKey), saveData);
+        }
+
+        public bool AppendData(string saveKey, string saveData)
+        {
+            return FileUtilities.AppendFile(Path.Join(Application.persistentDataPath, saveKey), saveData);
         }
 
         public bool CheckKeyExist(string saveKey)

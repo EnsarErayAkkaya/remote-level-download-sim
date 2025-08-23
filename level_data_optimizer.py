@@ -2,7 +2,7 @@ import os
 import json
 
 # Set the folder containing your JSON files
-folder_path = "C:/Eray/Repos/remote-level-download-sim/Assets/Resources/"
+folder_path = "C:/Eray/Repos/remote-level-download-sim/Levels/"
 
 print(f"starting checking files in {folder_path}")
 
@@ -31,8 +31,8 @@ for filename in os.listdir(folder_path):
             data = json.load(f)
             
         converted = {
-            "difficulty": difficulty_map.get(data["difficulty"], 0),
-            "board": board_to_hex(data["board"])
+            "d": difficulty_map.get(data["difficulty"], 0),
+            "b": board_to_hex(data["board"])
         }
         
         with open(file_path, "w") as f:

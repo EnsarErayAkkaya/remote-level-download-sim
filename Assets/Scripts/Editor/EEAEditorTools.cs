@@ -2,9 +2,9 @@ using System.IO;
 using UnityEditor;
 using UnityEngine;
 
-namespace Resolve.BaseServices.Editor
+namespace EEA.BaseServices.Editor
 {
-    public class ResolveEditorToolls
+    public class EEAEditorTools
     {
         [MenuItem("EEA Tools/Clear PlayerPrefs")]
         public static void ClearPlayerPrefs()

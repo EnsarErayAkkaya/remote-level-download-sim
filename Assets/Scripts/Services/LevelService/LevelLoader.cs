@@ -6,18 +6,29 @@ namespace EEA.BaseServices.LevelServices
     {
         public BaseLevelData LoadLevel(int index)
         {
-            // check if this level exists in updated levels
-
-            // if not, load the level from the resources folder
-            TextAsset levelData = Resources.Load<TextAsset>(GetLevelName(index + 1));
-
-            if (levelData != null)
+            try
             {
-                BaseLevelData level = JsonUtility.FromJson<BaseLevelData>(levelData.text);
+                // check if this level exists in updated levels
+                var downloadedLevel = ServiceManager.RemoteLevelService.GetDownloadedLevelData(index + 1);
 
-                Resources.UnloadAsset(levelData); // Unload the asset to free memory
+                if (downloadedLevel != null)
+                    return downloadedLevel;
 
-                return level;
+                // if not, load the level from the resources folder
+                TextAsset levelData = Resources.Load<TextAsset>(GetLevelName(index + 1));
+
+                if (levelData != null)
+                {
+                    BaseLevelData level = JsonUtility.FromJson<BaseLevelData>(levelData.text);
+
+                    Resources.UnloadAsset(levelData); // Unload the asset to free memory
+
+                    return level;
+                }
+            }
+            catch (System.Exception e)
+            {
+                Debug.Log($"Load Level Failed: {e.ToString()}");
             }
 
             return null;

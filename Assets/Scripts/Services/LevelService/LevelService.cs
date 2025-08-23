@@ -1,5 +1,5 @@
+using Cysharp.Threading.Tasks;
 using System;
-using System.Threading.Tasks;
 using UnityEngine;
 
 namespace EEA.BaseServices.LevelServices
@@ -48,12 +48,12 @@ namespace EEA.BaseServices.LevelServices
             return new BaseLevelConfig(levelData);
         }
 
-        public async Task LoadNextLevel()
+        public async UniTask LoadNextLevel()
         {
             await LoadLevel(GetCurrentLevelIndex());
         }
 
-        public async Task LoadLevel(int _index)
+        public async UniTask LoadLevel(int _index)
         {
             activeLevelConfig = GetLevelConfig(_index);
 
@@ -69,7 +69,7 @@ namespace EEA.BaseServices.LevelServices
             OnLevelStarted?.Invoke(_index);
         }
 
-        public async Task UnloadLevel()
+        public async UniTask UnloadLevel()
         {
             if (activeLevelConfig != null)
             {

@@ -82,9 +82,14 @@ namespace EEA.BaseServices.SaveServices
             return false;
         }
 
-        public async Task SaveDataAsync(string saveKey, string saveData)
+        public async Task<bool> SaveDataAsync(string saveKey, string saveData)
         {
-            await saveHandler.SaveDataAsync(saveKey, saveData);
+            return await saveHandler.SaveDataAsync(saveKey, saveData);
+        }
+
+        public async Task<bool> AppendDataAsync(string saveKey, string saveData)
+        {
+            return await saveHandler.AppendDataAsync(saveKey, saveData);
         }
 
         // SYNC FUNCTIONS
@@ -157,14 +162,20 @@ namespace EEA.BaseServices.SaveServices
             return false;
         }
 
-        public void SaveData(string saveKey, string saveData)
+        public bool SaveData(string saveKey, string saveData)
         {
-            saveHandler.SaveData(saveKey, saveData);
+            return saveHandler.SaveData(saveKey, saveData);
+        }
+        
+        public bool AppendData(string saveKey, string saveData)
+        {
+            return saveHandler.AppendData(saveKey, saveData);
         }
 
         public bool CheckKeyExist(string saveKey)
         {
             return saveHandler.CheckKeyExist(saveKey);
         }
+
     }
 }
