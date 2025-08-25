@@ -21,7 +21,7 @@ namespace EEA.Gameplay
             string boardString = levelData.BoardHexToBitwise();
 
             // setup level
-            StringBuilder stringBuilder = ClassPool<StringBuilder>.Spawn()  ?? new StringBuilder();
+            StringBuilder stringBuilder = ClassPool<StringBuilder>.Spawn() ?? new StringBuilder();
             stringBuilder.Clear();
 
             for (int i = 0; i < boardString.Length; i++)

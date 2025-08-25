@@ -12,16 +12,12 @@ namespace EEA.Utilities
             try
             {
                 // create the directory the file will be written to if it doesn't exist
-                Directory.CreateDirectory(Path.GetDirectoryName(savePath));
+                var dir = Path.GetDirectoryName(savePath);
 
-                using (FileStream stream = new FileStream(savePath, FileMode.Create))
-                {
-                    using (StreamWriter writer = new StreamWriter(stream))
-                    {
-                        writer.Write(saveData);
-                    }
-                }
+                if (!string.IsNullOrEmpty(dir))
+                    Directory.CreateDirectory(dir);
 
+                File.WriteAllText(savePath, saveData);
                 return true;
             }
             catch (Exception e)
@@ -58,12 +54,10 @@ namespace EEA.Utilities
             {
                 try
                 {
-                    using (FileStream stream = new FileStream(savePath, FileMode.Open))
+                    if (File.Exists(savePath))
                     {
-                        using (StreamReader reader = new StreamReader(stream))
-                        {
-                            dataToLoad = reader.ReadToEnd();
-                        }
+                        string data = File.ReadAllText(savePath);
+                        return data;
                     }
                 }
                 catch (Exception e)

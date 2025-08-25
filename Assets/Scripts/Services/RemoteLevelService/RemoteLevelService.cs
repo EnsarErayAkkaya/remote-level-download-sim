@@ -195,9 +195,12 @@ namespace EEA.RemoteLevelServices
             {
                 var data = ServiceManager.SaveService.LoadData(GetLevelFileName(levelIndex));
 
-                BaseLevelData levelData = JsonUtility.FromJson<BaseLevelData>(data);
+                if (string.IsNullOrEmpty(data))
+                {
+                    BaseLevelData levelData = JsonUtility.FromJson<BaseLevelData>(data);
 
-                return levelData;
+                    return levelData;
+                }
             }
 
             return null;
