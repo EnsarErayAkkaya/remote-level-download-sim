@@ -5,6 +5,7 @@ using EEA.Web;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using UnityEngine;
 
 namespace EEA.BaseServices.RemoteLevelServices
@@ -14,6 +15,8 @@ namespace EEA.BaseServices.RemoteLevelServices
         private const int DownloadBatchCount = 5;
 
         private readonly string LevelSavePath;
+
+        private List<int> succesfullyDownloadedIndexes = new();
 
         public DownloadLog DownloadLog { get; private set; }
 
@@ -38,8 +41,7 @@ namespace EEA.BaseServices.RemoteLevelServices
 
                 try
                 {
-                    Backoff backoff = new Backoff();
-                    _ = backoff.DoAsync(
+                    _ = Backoff.DoAsync(
                             action: () => BatchDownloadLevels(fromIndex, toIndex),
                             validateResult: () => IsAllLevelsDownloadedInRange(fromIndex, toIndex),
                             maxRetries: 3);
@@ -62,18 +64,32 @@ namespace EEA.BaseServices.RemoteLevelServices
             }
         }
 
+        public async UniTask SingleDownloadLevel(int index)
+        {
+            var levelData = await DownloadLevelAsync(index);
+
+            if (levelData != null)
+            {
+                await DownloadLog.AppendDownloadedLevel(index);
+
+            }
+        }
+
         public bool IsAllLevelsDownloadedInRange(int fromIndex, int toIndex)
         {
             for (int i = fromIndex; i < toIndex; i++)
             {
                 if (DownloadLog.IsLevelDownloaded(i) == false)
                 {
-                    Debug.Log($"Level {i} not downloaded in range {fromIndex}-{toIndex - 1}");
+                    if (ServiceManager.Instance.Settings.debugLog)
+                        Debug.Log($"Level {i} not downloaded in range {fromIndex}-{toIndex - 1}");
                     return false;
                 }
             }
 
-            Debug.Log($"All Level downloaded in range {fromIndex}-{toIndex - 1}");
+            if (ServiceManager.Instance.Settings.debugLog)
+                Debug.Log($"All Level downloaded in range {fromIndex}-{toIndex - 1}");
+
             return true;
         }
 
@@ -87,6 +103,18 @@ namespace EEA.BaseServices.RemoteLevelServices
             }
 
             BaseLevelData[] levelDatas = await UniTask.WhenAll(levelDataTasks);
+
+            succesfullyDownloadedIndexes.Clear();
+
+            for (int i = 0; i < levelDatas.Length; i++)
+            {
+                if (levelDatas[i] != null)
+                {
+                    succesfullyDownloadedIndexes.Add(startIndex + i);
+                }
+            }
+
+            await DownloadLog.AppendDownloadedLevelRange(succesfullyDownloadedIndexes);
 
             return levelDatas;
         }
@@ -107,7 +135,7 @@ namespace EEA.BaseServices.RemoteLevelServices
                         // check if level integrity valid
                         BaseLevelData levelData = JsonUtility.FromJson<BaseLevelData>(response.Data);
 
-                        if (levelData != null)
+                        if (levelData != null && levelData.b.Length == 16)
                         {
                             // level is valid, even saving fails return result
                             onSuccess?.Invoke(levelData);
@@ -116,9 +144,8 @@ namespace EEA.BaseServices.RemoteLevelServices
 
                             if (isLevelSaveSuccessfull)
                             {
-                                await DownloadLog.AppendDownloadedLevel(levelIndex);
-
-                                Debug.Log($"Level Downloaded {levelIndex}");
+                                if (ServiceManager.Instance.Settings.debugLog)
+                                    Debug.Log($"Level Downloaded {levelIndex}");
 
                                 return levelData;
                             }
@@ -140,7 +167,8 @@ namespace EEA.BaseServices.RemoteLevelServices
                 }
                 else
                 {
-                    Debug.Log($"Level {levelIndex} Already Downloaded");
+                    if (ServiceManager.Instance.Settings.debugLog)
+                        Debug.Log($"Level {levelIndex} Already Downloaded");
 
                     return await GetDownloadedLevelDataAsync(levelIndex);
                 }

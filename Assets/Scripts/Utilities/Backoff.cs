@@ -5,9 +5,9 @@ using System.Threading;
 
 namespace EEA.Utilities
 {
-    public class Backoff
+    public static class Backoff
     {
-        public async UniTask DoAsync(
+        public static async UniTask DoAsync(
             Func<UniTask> action,
             Func<bool> validateResult = null,
             int maxRetries = 10,

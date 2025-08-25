@@ -52,9 +52,8 @@ namespace EEA.BaseServices
             {
                 int startingLevel = currentLevelIndex + 1;
 
-                Backoff backoff = new Backoff();
-                await backoff.DoAsync(
-                        action: () => remoteLevelService.DownloadLevelAsync(startingLevel),
+                await Backoff.DoAsync(
+                        action: () => remoteLevelService.SingleDownloadLevel(startingLevel),
                         validateResult: () => remoteLevelService.DownloadLog.IsLevelDownloaded(startingLevel),
                         maxRetries: 3);
             }
@@ -69,8 +68,7 @@ namespace EEA.BaseServices
                 int levelRangeFrom = (currentLevelIndex - (currentLevelIndex % 25)) + 1;
                 int levelRangeTo = levelRangeFrom + 50;
 
-                Backoff downloadLevelRangeBackoff = new Backoff();
-                _ = downloadLevelRangeBackoff.DoAsync(
+                _ = Backoff.DoAsync(
                     action: () => remoteLevelService.BatchDownloadLevels(levelRangeFrom, levelRangeTo),
                     validateResult: () => remoteLevelService.IsAllLevelsDownloadedInRange(levelRangeFrom, levelRangeTo),
                     maxRetries: 3);

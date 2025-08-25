@@ -8,6 +8,8 @@ namespace EEA.BaseServices.RemoteLevelServices
     {
         public DownloadLog DownloadLog { get; }
         UniTask BatchDownloadLevels(int fromIndex, int toIndex);
+        UniTask SingleDownloadLevel(int index);
+
         UniTask<BaseLevelData> DownloadLevelAsync(int levelIndex, Action<BaseLevelData> onSuccess = null, Action<string> onError = null);
 
         UniTask<BaseLevelData> GetDownloadedLevelDataAsync(int levelIndex);

@@ -2,7 +2,9 @@ using Cysharp.Threading.Tasks;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading;
+using Unity.VisualScripting;
 
 namespace EEA.BaseServices.RemoteLevelServices
 {
@@ -40,6 +42,33 @@ namespace EEA.BaseServices.RemoteLevelServices
                 if (appendResult)
                 {
                     downloadedLevels.Add(levelIndex);
+                }
+            }
+            finally
+            {
+                semaphore.Release(); // let the next writer in
+            }
+        }
+
+        public async UniTask AppendDownloadedLevelRange(IEnumerable<int> indexes)
+        {
+            await semaphore.WaitAsync();
+
+            try
+            {
+                StringBuilder sb  = new StringBuilder();
+
+                foreach (int index in indexes)
+                {
+                    sb.Append(index);
+                    sb.AppendLine();
+                }
+
+                bool appendResult = await ServiceManager.SaveService.AppendDataAsync(DownloadedLevelsSaveKey, sb.ToString());
+
+                if (appendResult)
+                {
+                    downloadedLevels.AddRange(indexes);
                 }
             }
             finally

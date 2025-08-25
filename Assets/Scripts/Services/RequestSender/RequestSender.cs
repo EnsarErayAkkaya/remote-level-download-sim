@@ -1,4 +1,5 @@
 using Cysharp.Threading.Tasks;
+using EEA.BaseServices;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
@@ -30,20 +31,23 @@ namespace EEA.Web
                 if (webRequest.result == UnityWebRequest.Result.ConnectionError)
                 {
                     // Indicates a network issue, such as no internet connection or DNS resolution failure.
-                    Debug.Log($"Connection (cannot reach the server) error: {webRequest.error}, url: {url}");
+                    if (ServiceManager.Instance.Settings.debugLog)
+                        Debug.Log($"Connection (cannot reach the server) error: {webRequest.error}, url: {url}");
                 }
                 else if (webRequest.result == UnityWebRequest.Result.ProtocolError)
                 {
                     errorType = ErrorType.ProtocolError;
                     // Indicates an HTTP error returned by the server (e.g., 404 Not Found, 500 Internal Server Error).
-                    Debug.Log($"HTTP (protocol error) error: {webRequest.error}, url: {url}");
+                    if (ServiceManager.Instance.Settings.debugLog)
+                        Debug.Log($"HTTP (protocol error) error: {webRequest.error}, url: {url}");
                 }
                 else if (webRequest.result == UnityWebRequest.Result.DataProcessingError)
                 {
                     errorType = ErrorType.DataProcessingError;
 
                     // Indicates an error while processing the response data.
-                    Debug.Log($"Data processing (response was corrupted or not in correct format) error: {webRequest.error}, url: {url}");
+                    if (ServiceManager.Instance.Settings.debugLog)
+                        Debug.Log($"Data processing (response was corrupted or not in correct format) error: {webRequest.error}, url: {url}");
                 }
 
                 // Collect response details

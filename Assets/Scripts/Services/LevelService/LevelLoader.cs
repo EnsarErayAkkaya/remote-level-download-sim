@@ -28,7 +28,8 @@ namespace EEA.BaseServices.LevelServices
             }
             catch (System.Exception e)
             {
-                Debug.Log($"Load Level Failed: {e.ToString()}");
+                if (ServiceManager.Instance.Settings.debugLog)
+                    Debug.Log($"Load Level Failed: {e.ToString()}");
             }
 
             return null;
