@@ -1,7 +1,7 @@
 ﻿using System.Globalization;
 using System.Threading.Tasks;
 
-namespace EEA.BaseServices.SaveServices
+namespace EEA.SaveServices
 {
     public class SaveService : BaseService, ISaveService
     {

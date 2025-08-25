@@ -1,7 +1,6 @@
-using EEA.BaseServices;
+using EEA.BaseSceneControllers;
 using TMPro;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 namespace EEA.UI
@@ -19,13 +18,13 @@ namespace EEA.UI
 
             switch (levelConfig.LevelData.d)
             {
-                case BaseServices.LevelServices.LevelDifficulty.Easy:
+                case LevelServices.LevelDifficulty.Easy:
                     buttonBackground.color = Color.green;
                     break;
-                case BaseServices.LevelServices.LevelDifficulty.Medium:
+                case LevelServices.LevelDifficulty.Medium:
                     buttonBackground.color = Color.yellow;
                     break;
-                case BaseServices.LevelServices.LevelDifficulty.Hard:
+                case LevelServices.LevelDifficulty.Hard:
                     buttonBackground.color = Color.red;
                     break;
                 default:
@@ -35,7 +34,7 @@ namespace EEA.UI
         }
         public void OnClick()
         {
-            SceneManager.UnloadSceneAsync(1);
+            SceneController.Instance.UnloadScene(SceneType.MenuScene);
             ServiceManager.LevelService.LoadNextLevel();
         }
     }

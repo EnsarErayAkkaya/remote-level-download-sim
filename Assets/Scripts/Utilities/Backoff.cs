@@ -2,6 +2,7 @@ using Cysharp.Threading.Tasks;
 using System;
 using System.Collections.Generic;
 using System.Threading;
+using UnityEngine;
 
 namespace EEA.Utilities
 {
@@ -16,10 +17,11 @@ namespace EEA.Utilities
             CancellationToken cancellationToken = default)
         {
 
-            UnityEngine.Debug.Log("Backoff starting");
+            Debug.Log("Backoff starting");
 
             var backoff = new ExponentialBackoff(delayMilliseconds, maxDelayMilliseconds);
-            var exceptions = new List<Exception>();
+            var exceptions = ClassPool<List<Exception>>.Spawn() ?? new List<Exception>();
+            exceptions.Clear();
 
             for (var retry = 0; retry < maxRetries; retry++)
             {

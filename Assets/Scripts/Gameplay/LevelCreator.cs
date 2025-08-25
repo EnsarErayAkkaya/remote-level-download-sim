@@ -1,4 +1,7 @@
-using EEA.BaseServices;
+using EEA;
+using EEA.Utilities;
+using EEA.Web;
+using System.Text;
 using TMPro;
 using UnityEngine;
 
@@ -18,30 +21,31 @@ namespace EEA.Gameplay
             string boardString = levelData.BoardHexToBitwise();
 
             // setup level
-            string levelString = string.Empty;
+            StringBuilder stringBuilder = ClassPool<StringBuilder>.Spawn()  ?? new StringBuilder();
+            stringBuilder.Clear();
 
             for (int i = 0; i < boardString.Length; i++)
             {
                 if (boardString[i] == '1')
                 {
-                    levelString += "x";
+                    stringBuilder.Append('x');
                 }
                 else if (boardString[i] == '0')
                 {
-                    levelString += "o";
+                    stringBuilder.Append('o');
                 }
 
                 if ((i + 1) % 8 == 0)
                 {
-                    levelString += "\n";
+                    stringBuilder.AppendLine();
                 }
                 else
                 {
-                    levelString += " ";
+                    stringBuilder.Append(' ');
                 }
             }
 
-            boardText.text = levelString;
+            boardText.text = stringBuilder.ToString();
         }
     }
 }

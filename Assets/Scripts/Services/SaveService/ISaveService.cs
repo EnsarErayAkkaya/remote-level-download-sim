@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace EEA.BaseServices.SaveServices
+namespace EEA.SaveServices
 {
     public interface ISaveService
     {

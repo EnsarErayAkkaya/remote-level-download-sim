@@ -1,48 +1,36 @@
-using EEA.BaseServices.LevelServices;
-using EEA.BaseServices.RemoteLevelServices;
-using EEA.BaseServices.SaveServices;
+using Cysharp.Threading.Tasks;
+using EEA.LevelServices;
+using EEA.LoggerService;
+using EEA.RemoteLevelServices;
+using EEA.SaveServices;
 using EEA.Utilities;
 using System;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
-namespace EEA.BaseServices
+namespace EEA
 {
     public class ServiceManager : MonoBehaviour
     {
         [SerializeField] private ServiceManagerSettings settings;
 
-        public Action OnServicesReady { get; set; }
-
         private RemoteLevelService remoteLevelService;
         private LevelService levelService;
         private SaveService saveService;
 
-        private static ServiceManager instance;
-
         #region GETTERS
         public ServiceManagerSettings Settings => settings;
-        public static ILevelService LevelService => instance.levelService;
-        public static IRemoteLevelService RemoteLevelService => instance.remoteLevelService;
-        public static ISaveService SaveService => instance.saveService;
-        public static ServiceManager Instance => instance;
+        public static ILevelService LevelService => Instance.levelService;
+        public static IRemoteLevelService RemoteLevelService => Instance.remoteLevelService;
+        public static ISaveService SaveService => Instance.saveService;
+        public static ServiceManager Instance { get; private set; }
         #endregion
 
-        private void Awake()
+        public async UniTask Init()
         {
-            if (instance != null && instance != this)
-            {
-                Destroy(instance);
-            }
+            Instance = this;
+            saveService = new SaveService(new SaveHandler());
 
-            instance = this;
-        }
-
-        private async void Start()
-        {
-            saveService = new SaveService(new EncryptedSaveHandler());
-
-            levelService = new LevelService(settings.levelServiceSettings);
+            levelService = new LevelService();
 
             remoteLevelService = new RemoteLevelService();
 
@@ -59,7 +47,7 @@ namespace EEA.BaseServices
             }
             catch (Exception ex)
             {
-                Debug.LogError(ex.ToString());
+                EEALogger.LogError(ex.ToString());
             }
 
 
@@ -76,12 +64,8 @@ namespace EEA.BaseServices
             }
             catch (Exception ex)
             {
-                Debug.LogError(ex.ToString());
+                EEALogger.LogError(ex.ToString());
             }
-
-            OnServicesReady?.Invoke();
-
-            SceneManager.LoadScene(1, LoadSceneMode.Additive);
         }
     }
 }

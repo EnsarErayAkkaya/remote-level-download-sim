@@ -1,6 +1,7 @@
+using EEA.LoggerService;
 using UnityEngine;
 
-namespace EEA.BaseServices.LevelServices
+namespace EEA.LevelServices
 {
     public class LevelLoader
     {
@@ -29,7 +30,7 @@ namespace EEA.BaseServices.LevelServices
             catch (System.Exception e)
             {
                 if (ServiceManager.Instance.Settings.debugLog)
-                    Debug.Log($"Load Level Failed: {e.ToString()}");
+                    EEALogger.Log($"Load Level Failed: {e.ToString()}");
             }
 
             return null;

@@ -1,4 +1,4 @@
-namespace EEA.BaseServices
+namespace EEA
 {
     public abstract class BaseService
     {

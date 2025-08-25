@@ -3,9 +3,9 @@ using System.IO;
 using System.Threading.Tasks;
 using UnityEngine;
 
-namespace EEA.BaseServices.SaveServices
+namespace EEA.SaveServices
 {
-    public class EncryptedSaveHandler : ISaveHandler
+    public class SaveHandler : ISaveHandler
     {
         public async Task<string> LoadDataAsync(string saveKey)
         {

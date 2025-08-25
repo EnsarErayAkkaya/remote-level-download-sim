@@ -2,7 +2,7 @@ using System.IO;
 using UnityEditor;
 using UnityEngine;
 
-namespace EEA.BaseServices.Editor
+namespace EEA.Editor
 {
     public class EEAEditorTools
     {

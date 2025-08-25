@@ -45,7 +45,7 @@ namespace EEA.Utilities
             }
             catch (Exception ex)
             {
-                UnityEngine.Debug.LogError($"Failed to append file at {savePath}: {ex}");
+                Debug.LogError($"Failed to append file at {savePath}: {ex}");
                 return false;
             }
         }

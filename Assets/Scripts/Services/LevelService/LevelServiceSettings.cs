@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace EEA.BaseServices.LevelServices
+namespace EEA.LevelServices
 {
     [CreateAssetMenu(fileName = "LevelServiceSettings", menuName = "Services/Level Service/Level Service Settings", order = 1)]
     public class LevelServiceSettings : ScriptableObject

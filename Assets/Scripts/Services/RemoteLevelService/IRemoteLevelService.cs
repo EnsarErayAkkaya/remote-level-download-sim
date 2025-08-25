@@ -1,8 +1,8 @@
 using Cysharp.Threading.Tasks;
-using EEA.BaseServices.LevelServices;
+using EEA.LevelServices;
 using System;
 
-namespace EEA.BaseServices.RemoteLevelServices
+namespace EEA.RemoteLevelServices
 {
     public interface IRemoteLevelService
     {
@@ -10,7 +10,7 @@ namespace EEA.BaseServices.RemoteLevelServices
         UniTask BatchDownloadLevels(int fromIndex, int toIndex);
         UniTask SingleDownloadLevel(int index);
 
-        UniTask<BaseLevelData> DownloadLevelAsync(int levelIndex, Action<BaseLevelData> onSuccess = null, Action<string> onError = null);
+        UniTask<bool> DownloadLevelAsync(int levelIndex);
 
         UniTask<BaseLevelData> GetDownloadedLevelDataAsync(int levelIndex);
         BaseLevelData GetDownloadedLevelData(int levelIndex);

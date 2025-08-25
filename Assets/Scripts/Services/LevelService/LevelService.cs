@@ -1,13 +1,10 @@
-using Cysharp.Threading.Tasks;
 using System;
 using UnityEngine;
 
-namespace EEA.BaseServices.LevelServices
+namespace EEA.LevelServices
 {
     public class LevelService : BaseService, ILevelService
     {
-        private LevelServiceSettings settings;
-
         private BaseLevelConfig activeLevelConfig = null;
         private int activeLevelIndex = -1;
 
@@ -23,13 +20,8 @@ namespace EEA.BaseServices.LevelServices
         #region GETTERS
         public BaseLevelConfig ActiveLevelConfig => activeLevelConfig;
         public int ActiveLevelIndex => activeLevelIndex;
-        public LevelServiceSettings Settings => settings;
         #endregion
 
-        public LevelService(LevelServiceSettings _settings)
-        {
-            this.settings = _settings;
-        }
 
         public int GetCurrentLevelIndex()
         {
@@ -48,12 +40,12 @@ namespace EEA.BaseServices.LevelServices
             return new BaseLevelConfig(levelData);
         }
 
-        public async UniTask LoadNextLevel()
+        public void LoadNextLevel()
         {
-            await LoadLevel(GetCurrentLevelIndex());
+            LoadLevel(GetCurrentLevelIndex());
         }
 
-        public async UniTask LoadLevel(int _index)
+        public void LoadLevel(int _index)
         {
             activeLevelConfig = GetLevelConfig(_index);
 
@@ -64,16 +56,16 @@ namespace EEA.BaseServices.LevelServices
 
             activeLevelIndex = _index;
 
-            await activeLevelConfig.LoadLevel();
+            activeLevelConfig.LoadLevel();
 
             OnLevelStarted?.Invoke(_index);
         }
 
-        public async UniTask UnloadLevel()
+        public void UnloadLevel()
         {
             if (activeLevelConfig != null)
             {
-                await activeLevelConfig.UnloadLevel();
+                activeLevelConfig.UnloadLevel();
 
                 activeLevelConfig = null;
                 activeLevelIndex = -1;

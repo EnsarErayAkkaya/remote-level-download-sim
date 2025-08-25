@@ -1,7 +1,7 @@
 using Cysharp.Threading.Tasks;
-using EEA.BaseServices;
+using EEA.LoggerService;
+using EEA.Utilities;
 using System.Collections.Generic;
-using UnityEngine;
 using UnityEngine.Networking;
 
 namespace EEA.Web
@@ -32,14 +32,14 @@ namespace EEA.Web
                 {
                     // Indicates a network issue, such as no internet connection or DNS resolution failure.
                     if (ServiceManager.Instance.Settings.debugLog)
-                        Debug.Log($"Connection (cannot reach the server) error: {webRequest.error}, url: {url}");
+                        EEALogger.Log($"Connection (cannot reach the server) error: {webRequest.error}, url: {url}");
                 }
                 else if (webRequest.result == UnityWebRequest.Result.ProtocolError)
                 {
                     errorType = ErrorType.ProtocolError;
                     // Indicates an HTTP error returned by the server (e.g., 404 Not Found, 500 Internal Server Error).
                     if (ServiceManager.Instance.Settings.debugLog)
-                        Debug.Log($"HTTP (protocol error) error: {webRequest.error}, url: {url}");
+                        EEALogger.Log($"HTTP (protocol error) error: {webRequest.error}, url: {url}");
                 }
                 else if (webRequest.result == UnityWebRequest.Result.DataProcessingError)
                 {
@@ -47,7 +47,7 @@ namespace EEA.Web
 
                     // Indicates an error while processing the response data.
                     if (ServiceManager.Instance.Settings.debugLog)
-                        Debug.Log($"Data processing (response was corrupted or not in correct format) error: {webRequest.error}, url: {url}");
+                        EEALogger.Log($"Data processing (response was corrupted or not in correct format) error: {webRequest.error}, url: {url}");
                 }
 
                 // Collect response details
@@ -55,7 +55,15 @@ namespace EEA.Web
                 long statusCode = webRequest.responseCode;
                 string error = webRequest.result != UnityWebRequest.Result.Success ? webRequest.error : null;
 
-                return new Response(statusCode, body ?? "", error, errorType);
+                // class pool response to optimize
+                var response = ClassPool<Response>.Spawn() ?? new Response();
+
+                response.StatusCode = statusCode;
+                response.Data = body;
+                response.Error = error;
+                response.ErrorType = errorType;
+
+                return response;
             }
         }
     }

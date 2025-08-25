@@ -1,14 +1,14 @@
 using Cysharp.Threading.Tasks;
-using EEA.BaseServices.LevelServices;
+using EEA.LevelServices;
+using EEA.LoggerService;
 using EEA.Utilities;
 using EEA.Web;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using UnityEngine;
 
-namespace EEA.BaseServices.RemoteLevelServices
+namespace EEA.RemoteLevelServices
 {
     public class RemoteLevelService : IRemoteLevelService
     {
@@ -48,7 +48,7 @@ namespace EEA.BaseServices.RemoteLevelServices
                 }
                 catch (Exception ex)
                 {
-                    Debug.LogError(ex.ToString());
+                    EEALogger.LogError(ex.ToString());
                 }
             }
         }
@@ -66,12 +66,11 @@ namespace EEA.BaseServices.RemoteLevelServices
 
         public async UniTask SingleDownloadLevel(int index)
         {
-            var levelData = await DownloadLevelAsync(index);
+            var isDownloaded = await DownloadLevelAsync(index);
 
-            if (levelData != null)
+            if (isDownloaded)
             {
                 await DownloadLog.AppendDownloadedLevel(index);
-
             }
         }
 
@@ -82,33 +81,33 @@ namespace EEA.BaseServices.RemoteLevelServices
                 if (DownloadLog.IsLevelDownloaded(i) == false)
                 {
                     if (ServiceManager.Instance.Settings.debugLog)
-                        Debug.Log($"Level {i} not downloaded in range {fromIndex}-{toIndex - 1}");
+                        EEALogger.Log($"Level {i} not downloaded in range {fromIndex}-{toIndex - 1}");
                     return false;
                 }
             }
 
             if (ServiceManager.Instance.Settings.debugLog)
-                Debug.Log($"All Level downloaded in range {fromIndex}-{toIndex - 1}");
+                EEALogger.Log($"All Level downloaded in range {fromIndex}-{toIndex - 1}");
 
             return true;
         }
 
-        private async UniTask<BaseLevelData[]> DownloadLevelRange(int startIndex, int endIndex)
+        private async UniTask<bool[]> DownloadLevelRange(int startIndex, int endIndex)
         {
-            List<UniTask<BaseLevelData>> levelDataTasks = new();
+            List<UniTask<bool>> downloadTasks = new();
 
             for (int i = startIndex; i < endIndex; i++)
             {
-                levelDataTasks.Add(DownloadLevelAsync(i));
+                downloadTasks.Add(DownloadLevelAsync(i));
             }
 
-            BaseLevelData[] levelDatas = await UniTask.WhenAll(levelDataTasks);
+            bool[] downloadResult = await UniTask.WhenAll(downloadTasks);
 
             succesfullyDownloadedIndexes.Clear();
 
-            for (int i = 0; i < levelDatas.Length; i++)
+            for (int i = 0; i < downloadResult.Length; i++)
             {
-                if (levelDatas[i] != null)
+                if (downloadResult[i])
                 {
                     succesfullyDownloadedIndexes.Add(startIndex + i);
                 }
@@ -116,10 +115,9 @@ namespace EEA.BaseServices.RemoteLevelServices
 
             await DownloadLog.AppendDownloadedLevelRange(succesfullyDownloadedIndexes);
 
-            return levelDatas;
+            return downloadResult;
         }
-
-        public async UniTask<BaseLevelData> DownloadLevelAsync(int levelIndex, Action<BaseLevelData> onSuccess = null, Action<string> onError = null)
+        public async UniTask<bool> DownloadLevelAsync(int levelIndex)
         {
             try
             {
@@ -133,21 +131,18 @@ namespace EEA.BaseServices.RemoteLevelServices
                     if (response.IsSuccess)
                     {
                         // check if level integrity valid
-                        BaseLevelData levelData = JsonUtility.FromJson<BaseLevelData>(response.Data);
+                        BaseLevelData levelData = JsonUtility.FromJson<BaseLevelData>(response.Data); // TODO: MESSAGE PACK
 
                         if (levelData != null && levelData.b.Length == 16)
                         {
-                            // level is valid, even saving fails return result
-                            onSuccess?.Invoke(levelData);
-
                             bool isLevelSaveSuccessfull = await ServiceManager.SaveService.SaveDataAsync(GetLevelFileName(levelIndex), response.Data);
 
                             if (isLevelSaveSuccessfull)
                             {
                                 if (ServiceManager.Instance.Settings.debugLog)
-                                    Debug.Log($"Level Downloaded {levelIndex}");
+                                    EEALogger.Log($"Level Downloaded {levelIndex}");
 
-                                return levelData;
+                                return true;
                             }
                             else
                             {
@@ -160,25 +155,24 @@ namespace EEA.BaseServices.RemoteLevelServices
                         }
                     }
 
-                    Debug.LogError($"Failed to download level {levelIndex}: {response.Error}");
-                    onError?.Invoke(response.Error);
+                    EEALogger.LogError($"Failed to download level {levelIndex}: {response.Error}");
 
-                    return null;
+                    return false;
                 }
                 else
                 {
                     if (ServiceManager.Instance.Settings.debugLog)
-                        Debug.Log($"Level {levelIndex} Already Downloaded");
+                        EEALogger.Log($"Level {levelIndex} Already Downloaded");
 
-                    return await GetDownloadedLevelDataAsync(levelIndex);
+                    return false;
                 }
             }
             catch (Exception e)
             {
-                Debug.LogError($"Failed to download level {levelIndex}: {e.ToString()}");
+                EEALogger.LogError($"Failed to download level {levelIndex}: {e.ToString()}");
             }
 
-            return null;
+            return false;
         }
 
         public async UniTask<BaseLevelData> GetDownloadedLevelDataAsync(int levelIndex)

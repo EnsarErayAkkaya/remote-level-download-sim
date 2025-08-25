@@ -6,11 +6,13 @@ using System.Text;
 using System.Threading;
 using Unity.VisualScripting;
 
-namespace EEA.BaseServices.RemoteLevelServices
+namespace EEA.RemoteLevelServices
 {
     public class DownloadLog
     {
         private static readonly SemaphoreSlim semaphore = new SemaphoreSlim(1, 1);
+
+        private StringBuilder appendFileStringBuilder = new StringBuilder();
 
         public const string DownloadedLevelsSaveKey = "downloaded_level_indexes";
 
@@ -27,7 +29,7 @@ namespace EEA.BaseServices.RemoteLevelServices
             }
             else
             {
-                downloadedLevels = new ();
+                downloadedLevels = new();
             }
         }
 
@@ -56,19 +58,22 @@ namespace EEA.BaseServices.RemoteLevelServices
 
             try
             {
-                StringBuilder sb  = new StringBuilder();
+                appendFileStringBuilder.Clear();
 
                 foreach (int index in indexes)
                 {
-                    sb.Append(index);
-                    sb.AppendLine();
+                    appendFileStringBuilder.Append(index);
+                    appendFileStringBuilder.AppendLine();
                 }
 
-                bool appendResult = await ServiceManager.SaveService.AppendDataAsync(DownloadedLevelsSaveKey, sb.ToString());
+                bool appendResult = await ServiceManager.SaveService.AppendDataAsync(DownloadedLevelsSaveKey, appendFileStringBuilder.ToString());
 
                 if (appendResult)
                 {
-                    downloadedLevels.AddRange(indexes);
+                    foreach (var index in indexes)
+                    {
+                        downloadedLevels.Add(index);
+                    }
                 }
             }
             finally

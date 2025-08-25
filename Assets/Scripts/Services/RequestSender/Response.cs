@@ -48,6 +48,9 @@ namespace EEA.Web
 
         public ErrorType ErrorType;
 
+        public Response()
+        {}
+
         public Response(long statusCode, string data, string error, ErrorType errorType)
         {
             StatusCode = statusCode;
