@@ -12,24 +12,27 @@ namespace EEA.UI
 
         private void Start()
         {
-            levelText.text = $"Level {ServiceManager.LevelService.GetCurrentLevelIndex() + 1}";
+            levelText.SetText($"Level {ServiceManager.LevelService.GetCurrentLevelIndex() + 1}");
 
-            var levelConfig = ServiceManager.LevelService.GetCurrentLevelConfig();
+            var levelData = ServiceManager.LevelService.GetCurrentLevelData();
 
-            switch (levelConfig.LevelData.d)
+            if (levelData != null)
             {
-                case LevelServices.LevelDifficulty.Easy:
-                    buttonBackground.color = Color.green;
-                    break;
-                case LevelServices.LevelDifficulty.Medium:
-                    buttonBackground.color = Color.yellow;
-                    break;
-                case LevelServices.LevelDifficulty.Hard:
-                    buttonBackground.color = Color.red;
-                    break;
-                default:
-                    buttonBackground.color = Color.green;
-                    break;
+                switch (levelData.d)
+                {
+                    case LevelServices.LevelDifficulty.Easy:
+                        buttonBackground.color = Color.green;
+                        break;
+                    case LevelServices.LevelDifficulty.Medium:
+                        buttonBackground.color = Color.yellow;
+                        break;
+                    case LevelServices.LevelDifficulty.Hard:
+                        buttonBackground.color = Color.red;
+                        break;
+                    default:
+                        buttonBackground.color = Color.green;
+                        break;
+                }
             }
         }
         public void OnClick()

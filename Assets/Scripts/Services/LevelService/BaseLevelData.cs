@@ -22,6 +22,7 @@ namespace EEA.LevelServices
         public string BoardHexToBitwise()
         {
             StringBuilder stringBuilder = ClassPool<StringBuilder>.Spawn() ?? new StringBuilder();
+            stringBuilder.Clear();
 
             foreach (char c in b)
             {
@@ -30,7 +31,11 @@ namespace EEA.LevelServices
                 stringBuilder.Append(Convert.ToString(value, 2).PadLeft(4, '0'));
             }
 
-            return stringBuilder.ToString();
+            string result = stringBuilder.ToString();
+
+            ClassPool<StringBuilder>.Despawn(stringBuilder);
+
+            return result;
         }
     }
 }

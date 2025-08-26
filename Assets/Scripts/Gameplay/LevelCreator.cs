@@ -14,11 +14,9 @@ namespace EEA.Gameplay
 
         private void Start()
         {
-            var levelData = ServiceManager.LevelService.GetCurrentLevelConfig().LevelData;
-
             levelIndexText.text = $"Level {ServiceManager.LevelService.ActiveLevelIndex + 1}";
 
-            string boardString = levelData.BoardHexToBitwise();
+            string boardString = ServiceManager.LevelService.ActiveLevelData.BoardHexToBitwise();
 
             // setup level
             StringBuilder stringBuilder = ClassPool<StringBuilder>.Spawn() ?? new StringBuilder();
@@ -45,7 +43,9 @@ namespace EEA.Gameplay
                 }
             }
 
-            boardText.text = stringBuilder.ToString();
+            boardText.SetText(stringBuilder.ToString());
+
+            ClassPool<StringBuilder>.Despawn(stringBuilder);
         }
     }
 }

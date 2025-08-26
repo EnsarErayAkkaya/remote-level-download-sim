@@ -8,13 +8,15 @@ namespace EEA.LoggerService
         public static void Log(string s)
         {
             // save file or send to server in a real app but for now directly log
-
-            try
+            if (ServiceManager.Instance.Settings.debugLog)
             {
-                Debug.Log(s);
-            }
-            catch
-            {
+                try
+                {
+                    Debug.Log(s);
+                }
+                catch
+                {
+                }
             }
         }
 

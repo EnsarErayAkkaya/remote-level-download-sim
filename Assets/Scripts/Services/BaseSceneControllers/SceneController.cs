@@ -12,7 +12,12 @@ namespace EEA.BaseSceneControllers
     {
         private Dictionary<SceneType, GameObject> loadedScenes = new Dictionary<SceneType, GameObject>();
 
+        private const string InitialSceneKey = "initial_scene";
+        private const string MenuSceneKey = "menu_scene";
+        private const string GameSceneKey = "game_scene";
+
         public static SceneController Instance { get; private set; }
+
 
         private void Start()
         {
@@ -58,15 +63,15 @@ namespace EEA.BaseSceneControllers
         {
             if (sceneType == SceneType.InitialScene)
             {
-                return Resources.Load<GameObject>("initial_scene");
+                return Resources.Load<GameObject>(InitialSceneKey);
             }
             else if (sceneType == SceneType.MenuScene)
             {
-                return Resources.Load<GameObject>("menu_scene");
+                return Resources.Load<GameObject>(MenuSceneKey);
             }
             else if (sceneType == SceneType.GameScene)
             {
-                return Resources.Load<GameObject>("game_scene");
+                return Resources.Load<GameObject>(GameSceneKey);
             }
             else
             {

@@ -31,23 +31,20 @@ namespace EEA.Web
                 if (webRequest.result == UnityWebRequest.Result.ConnectionError)
                 {
                     // Indicates a network issue, such as no internet connection or DNS resolution failure.
-                    if (ServiceManager.Instance.Settings.debugLog)
-                        EEALogger.Log($"Connection (cannot reach the server) error: {webRequest.error}, url: {url}");
+                    EEALogger.Log($"Connection (cannot reach the server) error: {webRequest.error}, url: {url}");
                 }
                 else if (webRequest.result == UnityWebRequest.Result.ProtocolError)
                 {
                     errorType = ErrorType.ProtocolError;
                     // Indicates an HTTP error returned by the server (e.g., 404 Not Found, 500 Internal Server Error).
-                    if (ServiceManager.Instance.Settings.debugLog)
-                        EEALogger.Log($"HTTP (protocol error) error: {webRequest.error}, url: {url}");
+                    EEALogger.Log($"HTTP (protocol error) error: {webRequest.error}, url: {url}");
                 }
                 else if (webRequest.result == UnityWebRequest.Result.DataProcessingError)
                 {
                     errorType = ErrorType.DataProcessingError;
 
                     // Indicates an error while processing the response data.
-                    if (ServiceManager.Instance.Settings.debugLog)
-                        EEALogger.Log($"Data processing (response was corrupted or not in correct format) error: {webRequest.error}, url: {url}");
+                    EEALogger.Log($"Data processing (response was corrupted or not in correct format) error: {webRequest.error}, url: {url}");
                 }
 
                 // Collect response details

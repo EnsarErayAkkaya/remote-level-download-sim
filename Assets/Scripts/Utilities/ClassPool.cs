@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace EEA.Utilities
 {
@@ -30,7 +31,6 @@ namespace EEA.Utilities
         {
             // Get the matched index, or the last index
             var index = match != null ? cache.FindIndex(match) : cache.Count - 1;
-
             // Was one found?
             if (index >= 0)
             {
@@ -71,7 +71,8 @@ namespace EEA.Utilities
                 }
 
                 // Add to cache
-                cache.Add(instance);
+                if (!cache.Contains(instance))
+                    cache.Add(instance);
             }
         }
 

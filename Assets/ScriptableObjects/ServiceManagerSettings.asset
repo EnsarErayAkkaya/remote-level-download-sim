@@ -12,6 +12,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2dd2363d5a66bb249ac29cf3b0bbbe7a, type: 3}
   m_Name: ServiceManagerSettings
   m_EditorClassIdentifier: 
-  levelServiceSettings: {fileID: 11400000, guid: e1561f817e45008488103872d06a2364, type: 2}
-  poolServiceSettings: {fileID: 11400000, guid: bb1403ee9d9a2b343aaaadf5d1a9ddb8, type: 2}
-  debugLog: 1
+  debugLog: 0

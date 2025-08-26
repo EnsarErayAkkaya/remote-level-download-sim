@@ -16,9 +16,6 @@ namespace EEA.Utilities
             int delayMilliseconds = 200,
             CancellationToken cancellationToken = default)
         {
-
-            Debug.Log("Backoff starting");
-
             var backoff = new ExponentialBackoff(delayMilliseconds, maxDelayMilliseconds);
             var exceptions = ClassPool<List<Exception>>.Spawn() ?? new List<Exception>();
             exceptions.Clear();
@@ -35,6 +32,8 @@ namespace EEA.Utilities
                     bool isValid = validateResult?.Invoke() ?? true;
                     if (isValid)
                     {
+                        ClassPool<List<Exception>>.Despawn(exceptions);
+
                         return;
                     }
                 }
@@ -54,11 +53,19 @@ namespace EEA.Utilities
                 }
                 catch (OperationCanceledException)
                 {
-                    throw new AggregateException("Operation was canceled.", exceptions);
+                    var aggregateException_1 = new AggregateException("Operation was canceled.", exceptions);
+
+                    ClassPool<List<Exception>>.Despawn(exceptions);
+
+                    throw aggregateException_1;
                 }
             }
 
-            throw new AggregateException(exceptions);
+            var aggregateException = new AggregateException(exceptions);
+
+            ClassPool<List<Exception>>.Despawn(exceptions);
+
+            throw aggregateException;
         }
 
         private struct ExponentialBackoff

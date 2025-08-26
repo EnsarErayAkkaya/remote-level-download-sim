@@ -1,3 +1,4 @@
+using EEA.BaseSceneControllers;
 using System;
 using UnityEngine;
 
@@ -5,39 +6,45 @@ namespace EEA.LevelServices
 {
     public class LevelService : BaseService, ILevelService
     {
-        private BaseLevelConfig activeLevelConfig = null;
-        private int activeLevelIndex = -1;
-
-        private LevelLoader levelLoader = new LevelLoader();
+        private LevelDataLoader levelLoader = new LevelDataLoader();
 
         private const string LevelSaveKey = "current_level_index";
 
         #region EVENTS
-        public event Action<int> OnLevelStarted;
         public event Action<int, bool> OnLevelCompleted;
         #endregion
 
         #region GETTERS
-        public BaseLevelConfig ActiveLevelConfig => activeLevelConfig;
-        public int ActiveLevelIndex => activeLevelIndex;
+        public BaseLevelData ActiveLevelData
+        {
+            get
+            {
+                if (ActiveLevelIndex == -1)
+                    return null;
+
+                return levelData;
+            }
+        }
+        public int ActiveLevelIndex { get; private set; }
         #endregion
 
+        private BaseLevelData levelData = new();
 
         public int GetCurrentLevelIndex()
         {
-            return PlayerPrefs.GetInt(LevelSaveKey, 0);
+            return PlayerPrefs.GetInt(LevelSaveKey, 0) % 500; // limit to 500 fo this case
         }
 
-        public BaseLevelConfig GetCurrentLevelConfig()
+        public BaseLevelData GetCurrentLevelData()
         {
-            return GetLevelConfig(GetCurrentLevelIndex());
+            return GetLevelData(GetCurrentLevelIndex());
         }
 
-        public BaseLevelConfig GetLevelConfig(int _index)
+        public BaseLevelData GetLevelData(int _index)
         {
-            var levelData = levelLoader.LoadLevel(_index);
+            levelData = levelLoader.LoadLevel(_index, ref levelData);
 
-            return new BaseLevelConfig(levelData);
+            return levelData;
         }
 
         public void LoadNextLevel()
@@ -47,28 +54,26 @@ namespace EEA.LevelServices
 
         public void LoadLevel(int _index)
         {
-            activeLevelConfig = GetLevelConfig(_index);
+            GetLevelData(_index);
 
-            if (activeLevelConfig == null)
+            ActiveLevelIndex = _index;
+
+            if (ActiveLevelData == null)
             {
+                ActiveLevelIndex = -1;
                 return;
             }
 
-            activeLevelIndex = _index;
-
-            activeLevelConfig.LoadLevel();
-
-            OnLevelStarted?.Invoke(_index);
+            LevelInitializer.LoadLevel();
         }
 
         public void UnloadLevel()
         {
-            if (activeLevelConfig != null)
+            if (ActiveLevelIndex != -1)
             {
-                activeLevelConfig.UnloadLevel();
+                LevelInitializer.UnloadLevel();
 
-                activeLevelConfig = null;
-                activeLevelIndex = -1;
+                ActiveLevelIndex = -1;
             }
         }
 
@@ -76,13 +81,13 @@ namespace EEA.LevelServices
         {
             int currentLevelIndex = GetCurrentLevelIndex();
 
-            if (_isSuccessfull && activeLevelIndex == currentLevelIndex)
+            if (_isSuccessfull && ActiveLevelIndex == currentLevelIndex)
             {
                 PlayerPrefs.SetInt(LevelSaveKey, ++currentLevelIndex);
             }
 
-            OnLevelCompleted?.Invoke(activeLevelIndex, _isSuccessfull);
-            
+            OnLevelCompleted?.Invoke(ActiveLevelIndex, _isSuccessfull);
+
         }
     }
 }

@@ -6,6 +6,7 @@ using EEA.Web;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Text;
 using UnityEngine;
 
 namespace EEA.RemoteLevelServices
@@ -17,6 +18,7 @@ namespace EEA.RemoteLevelServices
         private readonly string LevelSavePath;
 
         private List<int> succesfullyDownloadedIndexes = new();
+        List<UniTask<bool>> downloadTasks = new();
 
         public DownloadLog DownloadLog { get; private set; }
 
@@ -80,21 +82,25 @@ namespace EEA.RemoteLevelServices
             {
                 if (DownloadLog.IsLevelDownloaded(i) == false)
                 {
-                    if (ServiceManager.Instance.Settings.debugLog)
-                        EEALogger.Log($"Level {i} not downloaded in range {fromIndex}-{toIndex - 1}");
+                    EEALogger.Log($"Level {i} not downloaded in range {fromIndex}-{toIndex - 1}");
                     return false;
                 }
             }
 
-            if (ServiceManager.Instance.Settings.debugLog)
-                EEALogger.Log($"All Level downloaded in range {fromIndex}-{toIndex - 1}");
+            EEALogger.Log($"All Level downloaded in range {fromIndex}-{toIndex - 1}");
 
             return true;
         }
 
+        /// <summary>
+        /// Download a range of levels and save them to Download log
+        /// </summary>
+        /// <param name="startIndex"></param>
+        /// <param name="endIndex"></param>
+        /// <returns></returns>
         private async UniTask<bool[]> DownloadLevelRange(int startIndex, int endIndex)
         {
-            List<UniTask<bool>> downloadTasks = new();
+            downloadTasks.Clear();
 
             for (int i = startIndex; i < endIndex; i++)
             {
@@ -119,6 +125,9 @@ namespace EEA.RemoteLevelServices
         }
         public async UniTask<bool> DownloadLevelAsync(int levelIndex)
         {
+            BaseLevelData levelData = null;
+            Response response = null;
+
             try
             {
                 if (!DownloadLog.IsLevelDownloaded(levelIndex))
@@ -126,12 +135,15 @@ namespace EEA.RemoteLevelServices
                     string url = Path.Join(LevelSavePath, GetLevelFileName(levelIndex));
 
                     // DOWNLOAD LEVEL
-                    Response response = await RequestSender.GetAsync(url);
+                    response = await RequestSender.GetAsync(url);
 
                     if (response.IsSuccess)
                     {
                         // check if level integrity valid
-                        BaseLevelData levelData = JsonUtility.FromJson<BaseLevelData>(response.Data); // TODO: MESSAGE PACK
+
+                        levelData = ClassPool<BaseLevelData>.Spawn() ?? new BaseLevelData();
+
+                        JsonUtility.FromJsonOverwrite(response.Data, levelData);
 
                         if (levelData != null && levelData.b.Length == 16)
                         {
@@ -139,8 +151,10 @@ namespace EEA.RemoteLevelServices
 
                             if (isLevelSaveSuccessfull)
                             {
-                                if (ServiceManager.Instance.Settings.debugLog)
-                                    EEALogger.Log($"Level Downloaded {levelIndex}");
+                                EEALogger.Log($"Level Downloaded {levelIndex}");
+
+                                ClassPool<Response>.Despawn(response);
+                                ClassPool<BaseLevelData>.Despawn(levelData);
 
                                 return true;
                             }
@@ -153,52 +167,43 @@ namespace EEA.RemoteLevelServices
                         {
                             response.Error = "Downloading was successful but couldn't parse json.";
                         }
+
+                        ClassPool<BaseLevelData>.Despawn(levelData);
                     }
 
                     EEALogger.LogError($"Failed to download level {levelIndex}: {response.Error}");
+
+                    ClassPool<Response>.Despawn(response);
 
                     return false;
                 }
                 else
                 {
-                    if (ServiceManager.Instance.Settings.debugLog)
-                        EEALogger.Log($"Level {levelIndex} Already Downloaded");
+                    EEALogger.Log($"Level {levelIndex} Already Downloaded");
 
                     return false;
                 }
             }
             catch (Exception e)
             {
+                ClassPool<Response>.Despawn(response);
+                ClassPool<BaseLevelData>.Despawn(levelData);
+
                 EEALogger.LogError($"Failed to download level {levelIndex}: {e.ToString()}");
             }
 
             return false;
         }
 
-        public async UniTask<BaseLevelData> GetDownloadedLevelDataAsync(int levelIndex)
-        {
-            if (DownloadLog.IsLevelDownloaded(levelIndex))
-            {
-                var data = await ServiceManager.SaveService.LoadDataAsync(GetLevelFileName(levelIndex));
-
-                BaseLevelData levelData = JsonUtility.FromJson<BaseLevelData>(data);
-
-                return levelData;
-            }
-
-            return null;
-        }
-
-        public BaseLevelData GetDownloadedLevelData(int levelIndex)
+        public BaseLevelData GetDownloadedLevelData(int levelIndex, ref BaseLevelData levelData)
         {
             if (DownloadLog.IsLevelDownloaded(levelIndex))
             {
                 var data = ServiceManager.SaveService.LoadData(GetLevelFileName(levelIndex));
 
-                if (string.IsNullOrEmpty(data))
+                if (!string.IsNullOrEmpty(data))
                 {
-                    BaseLevelData levelData = JsonUtility.FromJson<BaseLevelData>(data);
-
+                    JsonUtility.FromJsonOverwrite(data, levelData);
                     return levelData;
                 }
             }

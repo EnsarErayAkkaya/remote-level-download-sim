@@ -38,6 +38,8 @@ namespace EEA
 
             try
             {
+                // try to download current level and try for 3 times with backoff
+
                 int startingLevel = currentLevelIndex + 1;
 
                 await Backoff.DoAsync(
@@ -53,6 +55,8 @@ namespace EEA
 
             try
             {
+                // download next 50 level in range, since levels doesn't download multiple times
+                // starting level will not download two times
                 int levelRangeFrom = (currentLevelIndex - (currentLevelIndex % 25)) + 1;
                 int levelRangeTo = levelRangeFrom + 50;
 

@@ -12,8 +12,7 @@ namespace EEA.RemoteLevelServices
 
         UniTask<bool> DownloadLevelAsync(int levelIndex);
 
-        UniTask<BaseLevelData> GetDownloadedLevelDataAsync(int levelIndex);
-        BaseLevelData GetDownloadedLevelData(int levelIndex);
+        BaseLevelData GetDownloadedLevelData(int levelIndex, ref BaseLevelData levelData);
 
         string GetLevelFileName(int levelIndex);
     }
